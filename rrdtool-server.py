@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
 import json
 import cgi
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from datetime import datetime
 import time
 import math
@@ -15,7 +15,7 @@ IP_ADDRESS = socket.gethostbyname(socket.gethostname())
 QUERY_PREFIX = '/query'
 
 def rrd_values(fromdate, todate, rrdpath):
-    print fromdate, todate
+    print (fromdate, todate)
     start = 'midnight %s' % fromdate
     end = 'midnight %s' % todate
     if fromdate == todate:
@@ -57,12 +57,12 @@ class Server(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.startswith(QUERY_PREFIX):
-            print "Got QUERY request"
+            print ("Got QUERY request")
             qs = self.path[len(QUERY_PREFIX)+1:]
             qs = cgi.parse_qs(qs)
             if 'fromdate' not in qs:
                 self.send_response(500)
-                print "Got request with no date" 
+                print ("Got request with no date" )
                 return
             fromdate = qs.get('fromdate')[0]
             if 'todate' not in qs:
@@ -72,7 +72,7 @@ class Server(BaseHTTPRequestHandler):
 
             if 'rrdfile' not in qs:
                 self.send_response(500)
-                print "Got request with no rrdfile" 
+                print ("Got request with no rrdfile" )
                 return
             rrdfile = qs.get('rrdfile')[0]
 
@@ -91,7 +91,7 @@ class Server(BaseHTTPRequestHandler):
             self.wfile.write("OK")
             
 def usage():
-    print 'Usage: %s port /path/to/rrd/files' % sys.argv[0]
+    print ('Usage: %s port /path/to/rrd/files' % sys.argv[0])
     sys.exit(1)
       
 def start_server(ipaddress, port, rrdpath):
@@ -111,12 +111,12 @@ if __name__ == "__main__":
     port = int(sys.argv[1])
     rrdpath = sys.argv[2]
     if not os.path.exists(rrdpath):
-        print "Path does not exist: %s" % rrdpath
+        print ("Path does not exist: %s" % rrdpath)
         usage()
 
-    print "Listening on %s:%s" % (IP_ADDRESS, port)
+    print ("Listening on %s:%s" % (IP_ADDRESS, port))
     if as_daemon:
-        print "Daemonizing..."
+        print ("Daemonizing...")
         with daemon.DaemonContext():
             start_server(IP_ADDRESS, port, rrdpath)
     else:
